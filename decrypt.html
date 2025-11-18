@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECURE TRANSMISSION // Decrypt</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>SECURE TRANSMISSION // Decryption Terminal</h2>
+        <p>Input the secret password and upload the .cyphr file to unlock the data.</p>
+        <hr>
+
+        <label for="passwordDecrypt">Decryption Password (Key):</label>
+        <input type="password" id="passwordDecrypt" placeholder="Enter the exact secret password">
+
+        <label for="fileInputDecrypt">Upload .cyphr File:</label>
+        <input type="file" id="fileInputDecrypt" accept=".cyphr">
+
+        <button onclick="handleDecryption()">Decrypt File</button>
+
+        <h3 style="margin-top: 30px; color: var(--main-accent);">Decrypted Content:</h3>
+        <div id="decryptedOutput" class="output-box">
+            Awaiting file and password...
+        </div>
+        
+        <div id="mediaDisplay" style="margin-top: 20px; text-align: center;"></div>
+        
+        <p style="margin-top: 20px;">
+            <a href="index.html" style="color: var(--secondary-accent);"> &larr; Back to Index</a> |
+            <a href="encrypt.html" style="color: var(--main-accent);">Encryption Terminal &rarr;</a>
+        </p>
+    </div>
+
+    <script>
+        const FILE_HEADER = "CYPHR_B64_V2:";
+        const FILE_FOOTER = "//END_TX";
+        
+        document.getElementById('fileInputDecrypt').addEventListener('change', handleDecryption, false);
+
+        function deriveKey(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                hash = (hash + password.charCodeAt(i) * 31) % 256;
+            }
+            return hash % 26; 
+        }
+
+        function customEncrypt(text, key) {
+            let result = '';
+            for (let i = 0; i < text.length; i++) {
+                let charCode = text.charCodeAt(i);
+                result += String.fromCharCode(charCode + key);
+            }
+            return result;
+        }
+        
+        function customDecrypt(cipherText, key) {
+            const result = customEncrypt(cipherText, -key);
+            return result;
+        }
+
+        function handleDecryption() {
+            const file = document.getElementById('fileInputDecrypt').files[0];
+            const password = document.getElementById('passwordDecrypt').value.trim();
+            const output = document.getElementById('decryptedOutput');
+            const mediaDisplay = document.getElementById('mediaDisplay');
+            
+            output.innerHTML = '';
+            mediaDisplay.innerHTML = '';
+
+            if (!file || password.length < 4) {
+                output.innerHTML = `<span class="error">ERROR: Please input the password and select the .cyphr file.</span>`;
+                return;
+            }
+
+            const enteredKey = deriveKey(password);
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const fileContent = e.target.result;
+                
+                if (!fileContent.startsWith(FILE_HEADER) || !fileContent.endsWith(FILE_FOOTER)) {
+                    output.innerHTML = `<span class="error">ERROR: Invalid file format. Header/Footer mismatch.</span>`;
+                    return;
+                }
+
+                const headerLength = FILE_HEADER.length;
+                const footerLength = FILE_FOOTER.length;
+                const cipherText = fileContent.substring(headerLength, fileContent.length - footerLength);
+
+                const rawBase64 = customDecrypt(cipherText, enteredKey);
+                
+                displayDecryptedContent(rawBase64);
+            };
+            reader.readAsText(file);
+        }
+        
+        function displayDecryptedContent(rawBase64) {
+            const output = document.getElementById('decryptedOutput');
+            const mediaDisplay = document.getElementById('mediaDisplay');
+            
+            // Attempt to infer MIME type
+            let mimeType = '';
+            if (rawBase64.startsWith('/9j')) { mimeType = 'image/jpeg'; }
+            else if (rawBase64.startsWith('iVBORw')) { mimeType = 'image/png'; }
+            else if (rawBase64.startsWith('AAAAF')) { mimeType = 'video/mp4'; } // Common MP4 header
+            
+            const dataUrl = `data:${mimeType};base64,${rawBase64}`;
+            
+            if (mimeType.startsWith('image')) {
+                mediaDisplay.innerHTML = `<img src="${dataUrl}" style="max-width: 100%; height: auto; border-radius: 8px;">`;
+                output.innerHTML = `<span class="success">SUCCESS! Image file decrypted and displayed.</span>`;
+            } else if (mimeType.startsWith('video') || rawBase64.length > 200000) {
+                mediaDisplay.innerHTML = `<video controls src="${dataUrl}" style="max-width: 100%; height: auto; border-radius: 8px;">Your browser does not support the video tag.</video>`;
+                output.innerHTML = `<span class="success">SUCCESS! Decrypted file displayed (likely video/large binary).</span>`;
+            } else {
+                // Plain Text
+                try {
+                    const decodedText = atob(rawBase64); // Attempt Base64 decoding for display
+                    output.innerHTML = `<span class="success">SUCCESS! Decrypted text/data:</span> <br><br> ${decodedText}`;
+                } catch(e) {
+                    output.innerHTML = `<span class="success">SUCCESS! Decrypted data:</span> <br><br> ${rawBase64.substring(0, 50)}... (Binary or Corrupted Data)`;
+                }
+                mediaDisplay.innerHTML = ``;
+            }
+        }
+    </script>
+</body>
+</html>

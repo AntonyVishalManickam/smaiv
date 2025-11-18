@@ -1,0 +1,106 @@
+/* --- Global Styles & Attractive UI Reset --- */
+:root {
+    --primary-bg: #0D1B2A;      /* Deep Midnight Blue/Black BG */
+    --secondary-bg: #1B2A41;    /* Section Background */
+    --main-accent: #00FFFF;     /* Neon Cyan/Blue */
+    --secondary-accent: #FF00FF;/* Electric Fuchsia */
+    --text-color: #F0F0FF;      /* Off-White */
+    --button-color: #FFD700;    /* Electric Yellow/Gold */
+    --error-color: #FF5733;     /* Red Error */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    padding: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: 20px auto;
+    background-color: var(--secondary-bg);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 255, 255, 0.2); /* Neon shadow effect */
+    border: 1px solid var(--secondary-accent);
+}
+
+h2 {
+    color: var(--main-accent);
+    border-bottom: 3px solid var(--secondary-accent);
+    padding-bottom: 10px;
+    margin-bottom: 25px;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--secondary-accent);
+}
+
+textarea, input[type="text"], input[type="password"], input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 2px solid var(--main-accent);
+    border-radius: 6px;
+    background-color: #10192A; /* Darker input background */
+    color: var(--text-color);
+    box-sizing: border-box;
+    font-size: 1em;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input:focus, textarea:focus {
+    border-color: var(--button-color);
+    box-shadow: 0 0 8px var(--button-color);
+    outline: none;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--button-color);
+    color: var(--primary-bg);
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    font-size: 1.1em;
+}
+
+button:hover {
+    background-color: #ffc400;
+    transform: translateY(-2px);
+}
+
+/* Output and Feedback */
+.output-box {
+    margin-top: 25px;
+    padding: 15px;
+    background-color: #10192A;
+    border-radius: 6px;
+    border-left: 5px solid var(--secondary-accent);
+    min-height: 50px;
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+.error {
+    color: var(--error-color);
+    font-weight: bold;
+}
+.success {
+    color: #4CAF50;
+    font-weight: bold;
+}
