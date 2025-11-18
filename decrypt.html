@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECURE TRANSMISSION // Decrypt</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>SECURE TRANSMISSION // DECRYPT DATA</h2>
+        <p>Upload the .AV file and input the secret password to unlock the data.</p>
+        <hr>
+
+        <label for="passwordDecrypt">Decryption Password (Key):</label>
+        <input type="password" id="passwordDecrypt" placeholder="Enter the exact secret password">
+
+        <label for="fileInputDecrypt">Upload .AV File:</label>
+        <input type="file" id="fileInputDecrypt" accept=".AV">
+
+        <button onclick="handleDecryption()">DECRYPT & ACCESS</button>
+
+        <h3 style="margin-top: 30px; color: var(--main-accent);">Decrypted Content Preview:</h3>
+        <p id="decryptedOutputDisplay" class="output-box">Awaiting file upload...</p>
+        
+        <div id="mediaDisplay" style="margin-top: 20px; text-align: center;"></div>
+
+        <button id="downloadDecryptedBtn" onclick="downloadDecryptedFile()" disabled style="background-color: #4CAF50; color: white; margin-top: 20px; display: none;">Download Original File</button>
+        
+        <div class="sub-nav">
+            <a href="index.html">INDEX</a> | <a href="encrypt.html">ENCRYPT TERMINAL</a>
+        </div>
+    </div>
+
+    <script>
+        const FILE_HEADER = "AV_B64_V1:";
+        const FILE_FOOTER = "//END_AV";
+        let lastDecryptedBase64 = null; // Variable to hold the decoded data
+        let detectedMimeType = '';      // Variable to hold the detected file type
+
+        document.getElementById('fileInputDecrypt').addEventListener('change', handleDecryption, false);
+
+        // --- CORE LOGIC FUNCTIONS (Unchanged) ---
+        function deriveKey(password) {
+            if (!password) return 0;
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) { hash = (hash + password.charCodeAt(i) * 31) % 256; }
+            return hash % 26; 
+        }
+        function customEncrypt(text, key) {
+            let result = '';
+            for (let i = 0; i < text.length; i++) { result += String.fromCharCode(text.charCodeAt(i) + key); }
+            return result;
+        }
+        function customDecrypt(cipherText, key) {
+            return customEncrypt(cipherText, -key);
+        }
+        function updateOutput(message, isError = false) {
+            const output = document.getElementById('decryptedOutputDisplay');
+            output.innerHTML = isError ? `<span class="error">ERROR: ${message}</span>` : `<span class="success">SUCCESS: ${message}</span>`;
+            output.style.borderLeftColor = isError ? '#FF5733' : '#4CAF50';
+        }
+
+        // --- MAIN DECRYPTION HANDLER ---
+        function handleDecryption() {
+            const file = document.getElementById('fileInputDecrypt').files[0];
+            const password = document.getElementById('passwordDecrypt').value.trim();
+            
+            document.getElementById('mediaDisplay').innerHTML = '';
+            document.getElementById('downloadDecryptedBtn').disabled = true;
+            document.getElementById('downloadDecryptedBtn').style.display = 'none';
+
+            if (!file) { updateOutput("Please select a .AV file.", true); return; }
+            if (password.length > 0 && password.length < 4) { updateOutput("Password must be 4+ characters.", true); return; }
+            
+            const enteredKey = deriveKey(password);
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                processDecryptionLogic(e.target.result, enteredKey);
+            };
+            reader.readAsText(file);
+        }
+        
+        function processDecryptionLogic(fileContent, enteredKey) {
+            if (!fileContent.startsWith(FILE_HEADER) || !fileContent.endsWith(FILE_FOOTER)) {
+                updateOutput("Invalid file format. Header/Footer mismatch. Not a valid .AV file.", true);
+                return;
+            }
+
+            const headerLength = FILE_HEADER.length;
+            const footerLength = FILE_FOOTER.length;
+            const cipherText = fileContent.substring(headerLength, fileContent.length - footerLength);
+
+            const rawBase64 = customDecrypt(cipherText, enteredKey);
+            
+            displayDecryptedContent(rawBase64);
+        }
+        
+        // --- DISPLAY LOGIC AND DOWNLOAD PREP ---
+        function displayDecryptedContent(rawBase64) {
+            const output = document.getElementById('decryptedOutputDisplay');
+            const mediaDisplay = document.getElementById('mediaDisplay');
+            const downloadBtn = document.getElementById('downloadDecryptedBtn');
+
+            lastDecryptedBase64 = rawBase64; // Store data globally
+            
+            // 1. Infer MIME type (critical for download and display)
+            if (rawBase64.startsWith('/9j')) { detectedMimeType = 'image/jpeg'; }
+            else if (rawBase64.startsWith('iVBORw')) { detectedMimeType = 'image/png'; }
+            else if (rawBase64.length > 50000 && rawBase64.startsWith('JVBERi')) { detectedMimeType = 'application/pdf'; } // Basic PDF detection
+            else if (rawBase64.length > 100000) { detectedMimeType = 'video/mp4'; } // General large file guess
+            else { detectedMimeType = 'text/plain'; }
+            
+            const dataUrl = `data:${detectedMimeType};base64,${rawBase64}`;
+            
+            // 2. Display Content
+            if (detectedMimeType.startsWith('image')) {
+                mediaDisplay.innerHTML = `<img src="${dataUrl}" style="max-width: 100%; height: auto; border-radius: 8px;">`;
+                updateOutput(`File successfully decrypted. Image displayed.`, false);
+            } else if (detectedMimeType.startsWith('video') || detectedMimeType === 'video/mp4') { 
+                mediaDisplay.innerHTML = `<video controls src="${dataUrl}" style="max-width: 100%; height: auto; border-radius: 8px;">Your browser may not support the video tag.</video>`;
+                updateOutput(`File successfully decrypted. Video/Large Binary displayed.`, false);
+            } else {
+                // Plain Text/Unrecognized
+                try {
+                    const decodedText = atob(rawBase64);
+                    output.innerHTML = `<span class="success">Decrypted Text/Data:</span> <br><br> ${decodedText}`;
+                    mediaDisplay.innerHTML = `<p style="color: #999;">(Data displayed as text. Use download button for file format.)</p>`;
+                    detectedMimeType = 'text/plain'; // Force text for download if not binary
+                } catch(e) {
+                     updateOutput(`Data appears to be corrupted or incorrect password was used.`, true);
+                     mediaDisplay.innerHTML = ``;
+                     lastDecryptedBase64 = null;
+                     return;
+                }
+            }
+
+            // 3. Enable Download Button
+            downloadBtn.disabled = false;
+            downloadBtn.style.display = 'block';
+        }
+
+        // --- NEW DOWNLOAD FUNCTION ---
+        function downloadDecryptedFile() {
+            if (!lastDecryptedBase64) {
+                updateOutput("No decrypted data available for download.", true);
+                return;
+            }
+
+            // Function to convert Base64 string to a binary Blob
+            const b64toBlob = (b64Data, contentType = '', sliceSize = 512) => {
+                const byteCharacters = atob(b64Data);
+                const byteArrays = [];
+                for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+                    const slice = byteCharacters.slice(offset, offset + sliceSize);
+                    const byteNumbers = new Array(slice.length);
+                    for (let i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    byteArrays.push(byteArray);
+                }
+                return new Blob(byteArrays, { type: contentType });
+            };
+
+            const blob = b64toBlob(lastDecryptedBase64, detectedMimeType);
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            
+            // Guess file extension based on MIME type (default to .txt)
+            let extension = '.bin';
+            if (detectedMimeType.startsWith('image/jpeg')) extension = '.jpg';
+            else if (detectedMimeType.startsWith('image/png')) extension = '.png';
+            else if (detectedMimeType.startsWith('video/mp4')) extension = '.mp4';
+            else if (detectedMimeType.startsWith('text/plain')) extension = '.txt';
+
+            link.download = `unlocked_file${extension}`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            updateOutput(`File downloaded successfully as unlocked_file${extension}.`, false);
+        }
+    </script>
+</body>
+</html>

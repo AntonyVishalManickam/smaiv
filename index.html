@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECURE TRANSMISSION // System Index</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .instruction-step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: var(--secondary-bg);
+            border-left: 4px solid var(--main-accent);
+        }
+        .step-number {
+            font-size: 2.5em;
+            color: var(--main-accent);
+            margin-right: 20px;
+            font-weight: bold;
+            line-height: 1;
+        }
+        .step-content h3 {
+            color: var(--main-accent);
+            margin-bottom: 5px;
+        }
+        .button-group a {
+            background-color: var(--secondary-accent);
+            color: var(--primary-bg);
+        }
+        .button-group a:hover {
+            background-color: #E500E5;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>SECURE TRANSMISSION PROTOCOL // SYSTEM INDEX</h2>
+        <p>This system secures files (Image, Video, or Text) into a custom **.cyphr** file format, ensuring end-to-end privacy.</p>
+        <hr>
+
+        <h3 style="color: var(--main-accent); margin-bottom: 20px;">OPERATIONAL INSTRUCTIONS</h3>
+
+        <div class="instruction-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h3>CREATE & SHARE (Sender)</h3>
+                <p>Go to the **Encryption Terminal**. Enter the shared password, upload the file, and use the **Share File** button to send the `.cyphr` file directly.</p>
+            </div>
+        </div>
+
+        <div class="instruction-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h3>DECRYPT & ACCESS (Recipient)</h3>
+                <p>Go to the **Decryption Terminal**. Upload the received `.cyphr` file and input the *exact* password to reveal and display the original content.</p>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <a href="encrypt.html">GO TO ENCRYPTION TERMINAL &rarr;</a>
+            <a href="decrypt.html">GO TO DECRYPTION TERMINAL &rarr;</a>
+        </div>
+    </div>
+</body>
+</html>

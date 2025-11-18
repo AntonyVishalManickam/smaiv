@@ -1,0 +1,185 @@
+/* --- GLOBAL STYLES & NEO-CYBERPUNK THEME --- */
+:root {
+    --primary-bg: #0A0A0A;      /* Deep Black BG */
+    --secondary-bg: #1A1A1A;    /* Section Background */
+    --main-accent: #00FFFF;     /* Electric Cyan (Primary Focus) */
+    --secondary-accent: #FF00FF;/* Fuchsia (Secondary Highlight) */
+    --text-color: #F0F0FF;      /* Off-White Text */
+    --button-color: #00FFFF;    /* Button color matches accent */
+    --error-color: #FF5733;     /* Red Error */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    line-height: 1.6;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 20px auto;
+    background-color: var(--secondary-bg);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.4); /* Glowing effect */
+    border: 1px solid var(--main-accent);
+}
+
+h2 {
+    color: var(--main-accent);
+    border-bottom: 3px solid var(--secondary-accent);
+    padding-bottom: 10px;
+    margin-bottom: 25px;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+    font-size: 1.8em;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--secondary-accent);
+}
+
+textarea, input[type="password"], input[type="file"], input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid var(--main-accent);
+    border-radius: 4px;
+    background-color: #000;
+    color: var(--text-color);
+    box-sizing: border-box;
+    font-size: 1em;
+    transition: border-color 0.3s;
+}
+
+input:focus, textarea:focus {
+    border-color: var(--secondary-accent);
+    box-shadow: 0 0 8px var(--secondary-accent);
+    outline: none;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--button-color);
+    color: var(--primary-bg);
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    font-size: 1.1em;
+}
+
+button:hover {
+    background-color: #00DDDD;
+    transform: translateY(-1px);
+}
+
+/* Specific Layout and Buttons */
+.file-or-text-group {
+    border: 1px dashed rgba(255, 0, 255, 0.5);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+.action-buttons a, .action-buttons button {
+    flex-grow: 1;
+    text-align: center;
+    text-decoration: none;
+    padding: 12px;
+    font-size: 1em;
+}
+.action-buttons a:hover, .action-buttons button:hover {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Output and Feedback */
+.output-box {
+    margin-top: 25px;
+    padding: 15px;
+    background-color: #111;
+    border-left: 4px solid var(--main-accent);
+    min-height: 50px;
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+.error {
+    color: var(--error-color);
+    font-weight: bold;
+}
+.success {
+    color: #4CAF50;
+    font-weight: bold;
+}
+.sub-nav {
+    text-align: center;
+    margin-top: 20px;
+}
+.sub-nav a {
+    color: var(--main-accent);
+    margin: 0 10px;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+.sub-nav a:hover {
+    color: var(--secondary-accent);
+}
+
+/* Full Responsiveness */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    .container {
+        padding: 15px;
+        margin: 10px auto;
+    }
+    h2 {
+        font-size: 1.5em;
+    }
+    .action-buttons {
+        flex-direction: column;
+    }
+    .action-buttons a, .action-buttons button {
+        width: 100%;
+        margin-top: 5px;
+    }
+    .sub-nav a {
+        display: block;
+        margin: 5px 0;
+    }
+}
+/* Add this to your existing style.css */
+.file-info-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #000;
+    border: 1px dashed rgba(0, 255, 255, 0.4);
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+.custom-icon {
+    font-size: 1.5em;
+    color: var(--secondary-accent); /* Fuchsia */
+    margin-right: 15px;
+}
